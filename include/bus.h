@@ -15,6 +15,7 @@ class Bus {
    public:
     // Creates a variable width bus
     Bus(uint8_t width) : power(true), width(width) {}
+    Bus() : power(true), width(32) {}
 
     // For bus widths up to 32 bits, we can use a bitfield approach
     union {
