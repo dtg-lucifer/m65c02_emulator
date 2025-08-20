@@ -106,6 +106,16 @@ class Bus {
 
     // Reset all pins to 0
     void reset() { PINS = 0; }
+
+    // write the address line
+    void write_address(word addr) {
+        this->words.WORD_1 = addr & 0xFFFF;  // Write lower 16 bits
+    }
+
+    // write in the data line
+    void write_data(byte data) {
+        this->bytes.BYTE_3 = data & 0x00FF;  // Write to the first byte
+    }
 };
 
 #endif

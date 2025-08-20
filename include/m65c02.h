@@ -1,13 +1,26 @@
 #ifndef M65C02_H
 #define M65C02_H
 
+#include "bus.h"
 #include "types.h"
 
 class M65C02 {
    private:
     byte registers[3];  // Index registers
+    Bus& bus;           // Reference to the bus for memory access
 
    public:
+    // Constructor to initialize the CPU with a reference to the bus
+    M65C02(Bus& bus) : bus(bus) {
+        // Initialize registers to zero
+        for (int i = 0; i < 3; ++i) {
+            registers[i] = 0;
+        }
+        // Initialize program counter and stack pointer
+        PC = 0x0000;  // Start at address 0
+        SP = 0xFF;    // Stack pointer starts at 0xFF (top of stack)
+    }
+
     word PC;  // Program counter register
     byte SP;  // Stack pointer register (stores the lower 8-bit)
 

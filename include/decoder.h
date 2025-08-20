@@ -14,10 +14,11 @@ struct Mapping {
 };
 
 class AddressDecoder {
+   private:
     std::vector<Mapping> map;
 
    public:
-    void addMapping(word start, word end, MEM_Module* module) { map.push_back({start, end, module}); }
+    void add_mapping(word start, word end, MEM_Module* module) { map.push_back({start, end, module}); }
 
     byte read(word addr) {
         for (auto& m : map) {
