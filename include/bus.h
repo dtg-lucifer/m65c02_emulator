@@ -6,6 +6,9 @@
 
 #include "types.h"
 
+// The first 16-bits (`WORD_1`) will be reserved for the address lines
+// and like that the next 8-bits (`BYTE_3`) are for the data lines
+// the rest is flexible in use
 class Bus {
    private:
     bool power;
@@ -59,17 +62,28 @@ class Bus {
 
         // Access to 8-bit segments
         struct {
-            pinl_t BYTE_1 : 8;  // Bits 0-7
-            pinl_t BYTE_2 : 8;  // Bits 8-15
-            pinl_t BYTE_3 : 8;  // Bits 16-23
-            pinl_t BYTE_4 : 8;  // Bits 24-31
+            byte BYTE_1 : 8;  // Bits 0-7
+            byte BYTE_2 : 8;  // Bits 8-15
+            byte BYTE_3 : 8;  // Bits 16-23
+            byte BYTE_4 : 8;  // Bits 24-31
         } bytes;
 
         // Access to 16-bit segments
         struct {
-            pinl_t WORD_1 : 16;  // Bits 0-15
-            pinl_t WORD_2 : 16;  // Bits 16-31
+            word WORD_1 : 16;  // Bits 0-15
+            word WORD_2 : 16;  // Bits 16-31
         } words;
+
+        // Get the address
+        struct {
+            word ADDR : 16;  // The first 16-bits
+        };
+
+        // Get the data
+        struct {
+            pinl_t __skip : 16;  // skip the address line
+            byte DATA : 8;       // The next 8-bits for data
+        };
     };
 
     // Set a specific pin value (works for any width bus)
@@ -109,12 +123,20 @@ class Bus {
 
     // write the address line
     void write_address(word addr) {
-        this->words.WORD_1 = addr & 0xFFFF;  // Write lower 16 bits
+        this->ADDR = addr & 0xFFFF;  // Write lower 16 bits
+    }
+    // read the address line
+    word read_address() const {
+        return this->ADDR;  // Read the address from the first 16-bits
     }
 
     // write in the data line
     void write_data(byte data) {
-        this->bytes.BYTE_3 = data & 0x00FF;  // Write to the first byte
+        this->DATA = data & 0x00FF;  // Write to the first byte
+    }
+    // read the data line
+    byte read_data() const {
+        return this->DATA;  // Read the data from the first byte
     }
 };
 

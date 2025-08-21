@@ -15,4 +15,18 @@ enum class Register : byte {
     Y = 2,  // Index register Y
 };
 
+enum class ClockMode : byte {
+    A_STABLE = 0x00,    // Continuous clock cycles
+    MONO_STABLE = 0x01  // Manual stepping mode
+};
+
+// Holds the CPU state
+enum class CPU_State : byte {
+    POWER_OFF = 0x00,  // CPU is powered off
+    POWER_ON = 0x01,   // CPU is powered on
+    HALTED = 0x02,     // CPU is halted
+    RUNNING = 0x03,    // CPU is running
+    RESET = 0x04       // CPU is in reset state
+};
+
 #endif  // TYPES_H

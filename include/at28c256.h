@@ -2,9 +2,10 @@
 #define AT28C256_H
 
 #include "bus.h"
+#include "memory.h"
 #include "types.h"
 
-class AT28C256 {
+class AT28C256 : MEM_Module {
    private:
     byte memory[32 * 1024];  // 32KB
     Bus& bus;
@@ -54,15 +55,6 @@ class AT28C256 {
         };
     };
 
-    // Read a byte from the EEPROM at the specified address
-    byte read_byte(word addr);
-    // Write a byte to the EEPROM at the specified address
-    void write_byte(word addr, byte data);
-    // Read a word from the EEPROM at the specified address
-    word read_word(word addr);
-    // Write a word to the EEPROM at the specified address
-    void write_word(word addr, word data);
-
     // Read the value from the bus and write it to the address
     // on the bus
     void read_from_bus();
@@ -70,6 +62,9 @@ class AT28C256 {
     // This will write the data to the bus if the write enable
     // and chip enable are active
     void write_to_bus();
+
+    // Attach bus
+    void attach_to_bus(Bus& bus);
 };
 
 #endif  // AT28C256 EEPROM interface

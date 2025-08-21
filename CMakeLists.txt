@@ -19,7 +19,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Create a library for the core emulator code
 add_library(emulator_core
-    lib/m65c02.cpp
+    lib/wdc65c02.cpp
     lib/at28c256.cpp
     lib/mm_clock.cpp
     lib/bus.cpp

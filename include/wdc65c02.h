@@ -1,25 +1,16 @@
-#ifndef M65C02_H
-#define M65C02_H
+#ifndef WDC65C02_H
+#define WDC65C02_H
 
 #include "bus.h"
 #include "types.h"
 
-class M65C02 {
+class WDC65C02 {
    private:
     byte registers[3];  // Index registers
     Bus& bus;           // Reference to the bus for memory access
 
    public:
-    // Constructor to initialize the CPU with a reference to the bus
-    M65C02(Bus& bus) : bus(bus) {
-        // Initialize registers to zero
-        for (int i = 0; i < 3; ++i) {
-            registers[i] = 0;
-        }
-        // Initialize program counter and stack pointer
-        PC = 0x0000;  // Start at address 0
-        SP = 0xFF;    // Stack pointer starts at 0xFF (top of stack)
-    }
+    CPU_State state;  // Current state of the CPU
 
     word PC;  // Program counter register
     byte SP;  // Stack pointer register (stores the lower 8-bit)
@@ -28,6 +19,9 @@ class M65C02 {
     byte& A = registers[static_cast<byte>(Register::A)];
     byte& X = registers[static_cast<byte>(Register::X)];
     byte& Y = registers[static_cast<byte>(Register::Y)];
+
+    // Constructor to initialize the CPU with a reference to the bus
+    WDC65C02(Bus& bus);
 
     union {
         byte FLAGS;  // Status flags byte
@@ -103,12 +97,12 @@ class M65C02 {
         struct {
             pinl_t _skipA0 : 8;  // Skip non-address pins before A0
             pinl_t ADDR : 16;    // A0..A15 (low to high bit order)
-        } addr_bus;
+        };
 
         struct {
             pinl_t _skipD0 : 24;  // Skip pins before D7
             pinl_t DATA : 8;      // D7..D0
-        } data_bus;
+        };
     };
 
     // Get the value of a register
@@ -127,15 +121,24 @@ class M65C02 {
     // To power-on the cpu
     //
     // this will call the reset function manually everytime
-    // this is called too.
-    void start();
+    // this is called.
+    void boot();
+
+    // To start execution infinitely until
+    // either the state is `powered_off` or the cpu
+    // is `halted`
+    //
+    // Note:
+    //  - This will start execution in another thread other than the main
+    //  - This will sync with the clock pulse which it gets from the pin `PHI0`
+    void execute();
 
     // To fetch the next 16-bits from the memory
     // (consumes cycles)
     word fetch_word();
     // To fetch the next 8-bits from the memory
     // (consumes cycles)
-    byte featch_byte();
+    byte fetch_byte();
 
     // To read the next 16-bits
     // (doesn't consume cycles)
@@ -148,6 +151,9 @@ class M65C02 {
     // because the SP only stores the lower 8 bit of the
     // current address space
     word get_sp() const { return static_cast<word>(SP + 0x0100); }
+
+    // Attach the bus
+    void attach_to_bus(Bus& bus);
 };
 
-#endif  // M65C02 CPU interface
+#endif  // WDC65C02 CPU interface
