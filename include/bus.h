@@ -1,7 +1,9 @@
 #ifndef BUS_H
 #define BUS_H
 
+#include <condition_variable>
 #include <cstdint>
+#include <mutex>
 #include <vector>
 
 #include "types.h"
@@ -14,6 +16,12 @@ class Bus {
     bool power;
     uint8_t width;
     std::vector<pinl_t> lines;  // Storage for bus lines when width > 32 bits
+
+    // Thread synchronization
+    mutable std::mutex bus_mutex;             // Mutex for bus access
+    std::condition_variable bus_cv;           // Condition variable for signaling
+    bool bus_in_use = false;                  // Flag indicating if bus is currently being used
+    BusOwner current_owner = BusOwner::NONE;  // Current component owning the bus
 
    public:
     // Creates a variable width bus
@@ -119,24 +127,71 @@ class Bus {
     void power_off() { power = false; }
 
     // Reset all pins to 0
-    void reset() { PINS = 0; }
+    void reset() {
+        std::lock_guard<std::mutex> lock(bus_mutex);
+        PINS = 0;
+    }
 
     // write the address line
     void write_address(word addr) {
+        std::lock_guard<std::mutex> lock(bus_mutex);
         this->ADDR = addr & 0xFFFF;  // Write lower 16 bits
     }
     // read the address line
     word read_address() const {
+        std::lock_guard<std::mutex> lock(bus_mutex);
         return this->ADDR;  // Read the address from the first 16-bits
     }
 
     // write in the data line
     void write_data(byte data) {
+        std::lock_guard<std::mutex> lock(bus_mutex);
         this->DATA = data & 0x00FF;  // Write to the first byte
     }
     // read the data line
     byte read_data() const {
+        std::lock_guard<std::mutex> lock(bus_mutex);
         return this->DATA;  // Read the data from the first byte
+    }
+
+    // Request exclusive access to the bus for a component
+    bool request_bus(BusOwner owner, uint32_t timeout_ms = 100) {
+        std::unique_lock<std::mutex> lock(bus_mutex);
+        if (!bus_cv.wait_for(lock, std::chrono::milliseconds(timeout_ms), [this]() { return !bus_in_use; })) {
+            return false;  // Timeout occurred
+        }
+
+        bus_in_use = true;
+        current_owner = owner;
+        return true;
+    }
+
+    // Release bus after use
+    void release_bus(BusOwner owner) {
+        std::lock_guard<std::mutex> lock(bus_mutex);
+        if (current_owner == owner) {
+            bus_in_use = false;
+            current_owner = BusOwner::NONE;
+            bus_cv.notify_one();
+        }
+    }
+
+    // Perform a complete bus transaction atomically
+    template <typename Func>
+    auto atomic_bus_operation(BusOwner owner, Func operation) -> decltype(operation()) {
+        std::lock_guard<std::mutex> lock(bus_mutex);
+        return operation();
+    }
+
+    Bus& operator=(const Bus& other) {
+        if (this != &other) {
+            std::lock_guard<std::mutex> lock(bus_mutex);
+            this->power = other.power;
+            this->width = other.width;
+            this->lines = other.lines;  // Copy the lines vector
+            this->PINS = other.PINS;    // Copy the pin values
+        }
+        return *this;
     }
 };
 

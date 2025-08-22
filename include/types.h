@@ -29,4 +29,13 @@ enum class CPU_State : byte {
     RESET = 0x04       // CPU is in reset state
 };
 
+// Identifies which component currently owns the bus
+enum class BusOwner : byte {
+    NONE = 0,      // No component owns the bus
+    CPU = 1,       // CPU owns the bus
+    MEMORY = 2,    // Memory module owns the bus
+    CLOCK = 3,     // Clock module owns the bus
+    IO_DEVICE = 4  // I/O device owns the bus
+};
+
 #endif  // TYPES_H

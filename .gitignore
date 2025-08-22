@@ -1,3 +1,7 @@
+# Build related files
 .cache
 build
 compile_commands.json
+
+# Rom files
+*.bin

@@ -1,5 +1,5 @@
-#ifndef I_MEMORY_H
-#define I_MEMORY_H
+#ifndef MEMORY_H
+#define MEMORY_H
 
 #include "types.h"
 
@@ -12,4 +12,4 @@ class MEM_Module {
     virtual ~MEM_Module() = default;
 };
 
-#endif  // I_MEMORY_H
+#endif  // MEMORY_H

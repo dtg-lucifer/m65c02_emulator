@@ -1,10 +1,13 @@
 #ifndef DECODER_H
 #define DECODER_H
 
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <vector>
 
-#include "i_memory.h"
+#include "log.h"
+#include "memory.h"
 #include "types.h"
 
 struct Mapping {
@@ -23,21 +26,32 @@ class AddressDecoder {
     byte read(word addr) {
         for (auto& m : map) {
             if (addr >= m.start && addr <= m.end) {
-                return m.module->read_word(addr - m.start);
+                // Calculate local address within the module
+                word local_addr = addr - m.start;
+                return m.module->read_word(local_addr);
             }
         }
-        std::cerr << "Invalid read at " << std::hex << addr << "\n";
-        return 0xFF;
+        // Use proper logging instead of cerr
+        std::stringstream ss;
+        ss << "Invalid memory read at address 0x" << std::hex << std::setw(4) << std::setfill('0') << addr;
+        logger::error(ss.str());
+        return 0xFF;  // Return a default value for unmapped memory
     }
 
     void write(word addr, word val) {
         for (auto& m : map) {
             if (addr >= m.start && addr <= m.end) {
-                m.module->write_word(addr - m.start, val);
+                // Calculate local address within the module
+                word local_addr = addr - m.start;
+                m.module->write_word(local_addr, val);
                 return;
             }
         }
-        std::cerr << "Invalid write at " << std::hex << addr << "\n";
+        // Use proper logging instead of cerr
+        std::stringstream ss;
+        ss << "Invalid memory write at address 0x" << std::hex << std::setw(4) << std::setfill('0') << addr
+           << " with value 0x" << std::setw(2) << std::setfill('0') << (int)val;
+        logger::error(ss.str());
     }
 };
 
