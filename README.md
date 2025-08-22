@@ -27,9 +27,9 @@ graph TD
 
 ```mermaid
 graph LR
-    classDef ram fill:#b3e0ff,stroke:#0066cc
-    classDef rom fill:#ffb3b3,stroke:#cc0000
-    classDef special fill:#ffffb3,stroke:#cccc00
+    classDef ram
+    classDef rom
+    classDef special
 
     R0["0x0000-0x7FFF<br>RAM (32KB)"] -.-> FULL["64KB<br>Address Space"]
     R1["0x8000-0xFFFB<br>ROM (Program)"] -.-> FULL
@@ -56,11 +56,13 @@ Emulates the Western Design Center 65C02 8-bit microprocessor with:
 ### Memory System
 
 **RAM: HM62256B SRAM**
+
 - 32KB capacity (0x0000-0x7FFF)
 - Pin-accurate interface
 - Read/write operations synchronized with bus
 
 **ROM: AT28C256 EEPROM**
+
 - 32KB capacity (0x8000-0xFFFF)
 - Pin-accurate interface
 - Contains program code and reset vectors
@@ -68,11 +70,12 @@ Emulates the Western Design Center 65C02 8-bit microprocessor with:
 ### System Bus
 
 Central communication channel:
+
 ```mermaid
 graph LR
-    classDef address fill:#b3e0ff,stroke:#0066cc
-    classDef data fill:#ffb3b3,stroke:#cc0000
-    classDef control fill:#c2f0c2,stroke:#339933
+    classDef address
+    classDef data
+    classDef control
 
     A[Address Lines<br>16 bits] --- BUS[System Bus]
     D[Data Lines<br>8 bits] --- BUS
@@ -84,6 +87,7 @@ graph LR
 ```
 
 Features:
+
 - Mutex-protected access for thread safety
 - Component ownership arbitration
 - Direct pin-level interface
@@ -91,12 +95,14 @@ Features:
 ### Clock Module
 
 Provides timing signals with two operational modes:
+
 - **A_STABLE**: Continuous clock pulses at configurable frequency
 - **MONO_STABLE**: Manual stepping for debugging
 
 ### Address Decoder
 
 Maps the 16-bit address space to appropriate memory modules:
+
 ```mermaid
 flowchart TD
     ADDR[Address] --> DECODER{Address<br>Decoder}
@@ -169,9 +175,11 @@ make
 ### Clock Speed Configuration
 
 Edit the clock speed in `main.cpp` to adjust execution speed:
+
 ```cpp
 MM_ClockModule clock(2.0f, ClockMode::A_STABLE);  // 2 Hz
 ```
+
 - **Lower values** (e.g., 0.5 Hz): Slower execution, better for observing execution details
 - **Higher values** (e.g., 10 Hz): Faster execution, better for running longer programs
 
@@ -247,12 +255,14 @@ decoder.add_mapping(0x6000, 0x600F, &io_device);
 ### Implementing New Instructions
 
 To add support for new CPU instructions:
+
 1. Add the opcode to `op_codes.h`
 2. Implement the instruction in `WDC65C02::execute_instruction()` in `wdc65c02.cpp`
 
 ### Adding Peripheral Devices
 
 To add new hardware components:
+
 1. Create a new class implementing the appropriate interfaces
 2. Connect it to the bus in `main.cpp`
 3. Map any memory-mapped registers through the address decoder
