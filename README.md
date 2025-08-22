@@ -27,9 +27,9 @@ graph TD
 
 ```mermaid
 graph LR
-    classDef ram
-    classDef rom
-    classDef special
+    classDef ram;
+    classDef rom;
+    classDef special;
 
     R0["0x0000-0x7FFF<br>RAM (32KB)"] -.-> FULL["64KB<br>Address Space"]
     R1["0x8000-0xFFFB<br>ROM (Program)"] -.-> FULL
@@ -73,9 +73,9 @@ Central communication channel:
 
 ```mermaid
 graph LR
-    classDef address
-    classDef data
-    classDef control
+    classDef address;
+    classDef data;
+    classDef control;
 
     A[Address Lines<br>16 bits] --- BUS[System Bus]
     D[Data Lines<br>8 bits] --- BUS
