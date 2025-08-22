@@ -5,9 +5,10 @@
 #include "memory.h"
 #include "types.h"
 
-class AT28C256 : MEM_Module {
-   private:
+class AT28C256 : public MEM_Module {
+   public:                   // Make memory public for debugging purposes
     byte memory[32 * 1024];  // 32KB
+   private:
     Bus& bus;
 
    public:
@@ -65,6 +66,18 @@ class AT28C256 : MEM_Module {
 
     // Attach bus
     void attach_to_bus(Bus& bus);
+
+    // Start monitoring the bus in a separate thread
+    void start_monitoring();
+
+    // Stop monitoring the bus
+    void stop_monitoring();
+
+    // Memory interface implementation
+    word read_word(word addr) override;
+    byte read_byte(byte addr) override;
+    void write_word(word addr, word data) override;
+    void write_byte(byte addr, byte data) override;
 };
 
 #endif  // AT28C256 EEPROM interface

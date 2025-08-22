@@ -2,12 +2,14 @@
 #define WDC65C02_H
 
 #include "bus.h"
+#include "decoder.h"
 #include "types.h"
 
 class WDC65C02 {
    private:
-    byte registers[3];  // Index registers
-    Bus& bus;           // Reference to the bus for memory access
+    byte registers[3];            // Index registers
+    Bus& bus;                     // Reference to the bus for memory access
+    AddressDecoder* decoder_ptr;  // Pointer to the address decoder for memory access
 
    public:
     CPU_State state;  // Current state of the CPU
@@ -21,7 +23,7 @@ class WDC65C02 {
     byte& Y = registers[static_cast<byte>(Register::Y)];
 
     // Constructor to initialize the CPU with a reference to the bus
-    WDC65C02(Bus& bus);
+    WDC65C02(Bus& bus, AddressDecoder* decoder = nullptr);
 
     union {
         byte FLAGS;  // Status flags byte
@@ -37,7 +39,7 @@ class WDC65C02 {
         };
     };
 
-    // Pin layout for MOS 6502 with address/data bus access
+    // Pin layout for WDC65C02 with address/data bus access
     union {
         pinl_t PINS;  // Raw access to all pins at once
 
@@ -133,6 +135,8 @@ class WDC65C02 {
     //  - This will sync with the clock pulse which it gets from the pin `PHI0`
     void execute();
 
+    void execute_instruction();
+
     // To fetch the next 16-bits from the memory
     // (consumes cycles)
     word fetch_word();
@@ -154,6 +158,9 @@ class WDC65C02 {
 
     // Attach the bus
     void attach_to_bus(Bus& bus);
+
+    // Set address decoder for memory access
+    void set_decoder(AddressDecoder* decoder);
 };
 
 #endif  // WDC65C02 CPU interface

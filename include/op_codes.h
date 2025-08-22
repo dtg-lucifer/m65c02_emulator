@@ -57,6 +57,16 @@ enum class Op : byte {
     // Register Transfer Operations
     TSX = 0xBA,  // Transfer Stack Pointer to X
     TXS = 0x9A,  // Transfer X to Stack Pointer
+    TAX = 0xAA,  // Transfer Accumulator to X
+    TAY = 0xA8,  // Transfer Accumulator to Y
+    TXA = 0x8A,  // Transfer X to Accumulator
+    TYA = 0x98,  // Transfer Y to Accumulator
+    // -----------------------------------------------
+    // Increment & Decrement Operations
+    INX = 0xE8,  // Increment X Register
+    INY = 0xC8,  // Increment Y Register
+    DEX = 0xCA,  // Decrement X Register
+    DEY = 0x88,  // Decrement Y Register
     // -----------------------------------------------
 };
 

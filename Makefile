@@ -11,7 +11,7 @@ build:
 .PHONY: build
 
 run:
-	@./build/bin/6502_cpu_emulator
+	@./build/bin/m6502
 .PHONY: run
 
 setup:
